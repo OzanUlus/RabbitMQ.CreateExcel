@@ -1,7 +1,21 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using RabbitMQ.CreateExcel.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<AppDbContext>(opt =>
+{
+    opt.UseSqlServer(builder.Configuration.GetConnectionString("sqlCon"));
+});
+
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(opt => { 
+
+  opt.User.RequireUniqueEmail = true;
+
+}).AddEntityFrameworkStores<AppDbContext>();
 
 var app = builder.Build();
 
@@ -18,6 +32,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();    
 app.UseAuthorization();
 
 app.MapControllerRoute(
